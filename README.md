@@ -5,7 +5,7 @@
 ## Требования
 
 - Windows (PowerShell 5.1+ или PowerShell 7+).
-- ADB (adb.exe) в папке `/adb` или в PATH.
+- ADB (adb.exe) в папке `/adb`.
 
 ## Быстрый старт
 
