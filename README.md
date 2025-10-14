@@ -5,9 +5,7 @@
 ## Требования
 
 - Windows (PowerShell 5.1+ или PowerShell 7+).
-- Java (портабельно используется из `/java` если есть).
 - ADB (adb.exe) в папке `/adb` или в PATH.
-- Apktool (apktool.bat / apktool.jar) в папке `/apktool`.
 
 ## Быстрый старт
 
