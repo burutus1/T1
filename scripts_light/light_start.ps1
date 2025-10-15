@@ -16,7 +16,7 @@ $ProgressPreference = 'SilentlyContinue'
 # --- Configuration ---
 # The script is now in the 'scripts' dir, so the base dir is one level up.
 $BaseDir = Split-Path $PSScriptRoot -Parent
-$ScriptsDir = Join-Path $PSScriptRoot 'scripts_light'# This script is now inside the scripts dir
+$ScriptsDir = $PSScriptRoot	# This script is now inside the scripts dir
 $AppsDir = Join-Path $BaseDir '_APPS_'
 
 $AdbPath = Join-Path (Join-Path $BaseDir 'adb') 'adb.exe'
@@ -33,9 +33,11 @@ function Check-Environment {
 
     Write-Host "One or more dependencies are missing. Running setup script..."
     try {
-        & (Join-Path $ScriptsDir 'setup_light.ps1')
+        $setupScript = (Join-Path $ScriptsDir 'setup_light.ps1')
+        Start-Process -WorkingDirectory $BaseDir -FilePath powershell.exe -ArgumentList "-ExecutionPolicy Bypass -File `"$setupScript`"" -NoNewWindow -Wait
     }
     catch {
+
         Write-Error "Environment setup failed. Please run '$ScriptsDirs\setup_light.ps1' manually and resolve any errors."
         exit 1
     }
