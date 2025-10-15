@@ -1,4 +1,4 @@
-# Менеджер APK/XAPK скриптами (PowerShell)
+# Менеджер APK/XAPK скриптов (PowerShell)
 
 Набор PowerShell-скриптов для удобной установки Android-приложений (.apk / .xapk) на устройства через ADB.
 
