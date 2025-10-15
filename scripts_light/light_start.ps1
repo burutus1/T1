@@ -139,43 +139,10 @@ function Invoke-Uninstall($app) {
 
 function Invoke-Run($app) {    
     if (-not (Test-AdbConnection)) { return }
-    Write-Host "Checking if $($app.AppName) is installed..."
-
-    $installedPackages = (& $AdbPath shell pm list packages) -join "`n"
-    if ($installedPackages -notmatch [regex]::Escape($app.PackageName)) {
-        Write-Host "App not installed. Running installation first..."
-        Invoke-Install $app
-        # Give device a moment to register the newly installed package
-        Start-Sleep -Seconds 2
-        $installedPackages = (& $AdbPath shell pm list packages) -join "`n"
-        if ($installedPackages -notmatch [regex]::Escape($app.PackageName)) {
-            Write-Error "Installation seems to have failed. Could not find package after install."
-            pause
-            return
-        }
-    }
-
-    $launchActivityFile = Join-Path (Join-Path $AppsDir $app.PackageName) 'launch.txt'
-    if (-not (Test-Path $launchActivityFile)) { Write-Error "Launch activity file not found! Cannot run this application."; pause; return }
-    try {
-        $launchActivity = (Get-Content -Path $launchActivityFile -Encoding UTF8 -Raw).Trim()
-    }
-    catch {
-        Write-Error "Failed to read launch activity: $_"; pause; return
-    }
-
-    if ($launchActivity -ieq "monkey") {
-        Write-Host "Launching $($app.PackageName) using monkey command..."
-        & $AdbPath shell monkey -p $app.PackageName -c android.intent.category.LAUNCHER 1
-    }
-    else {
-        # Construct component as PackageName/ActivityIdentifier. ActivityIdentifier can be
-        # ".MainActivity" or "com.example.MainActivity"; both are valid after the slash.
-        $component = "$($app.PackageName)/$launchActivity"
-        Write-Host "Launching $component..."
-        & $AdbPath shell am start -n $component
-    }
-    pause
+    $appDir = Join-Path $AppsDir $app.PackageName
+    $scriptPath = Join-Path $appDir 'run.bat'
+    if (-not (Test-Path $scriptPath)) { Write-Error "Uninstall script not found!"; pause; return }
+    Start-Process -FilePath cmd.exe -ArgumentList "/c `"$scriptPath`"" -WorkingDirectory $appDir -Wait
 }
 
 # --- Main Execution ---
@@ -219,7 +186,7 @@ while ($true) {
     
     # Action Menu Loop
     while ($true) {
-        $launchActivityFile = Join-Path (Join-Path $AppsDir $selectedApp.PackageName) 'launch.txt'
+        $launchActivityFile = Join-Path (Join-Path $AppsDir $selectedApp.PackageName) 'run.bat'
         $hasLaunchActivity = Test-Path $launchActivityFile
 
         $actionOptions = @("Install", "Uninstall")
