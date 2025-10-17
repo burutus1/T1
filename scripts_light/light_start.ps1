@@ -174,14 +174,25 @@ if ($apps.Count -eq 0) {
 
 # Main Menu Loop
 while ($true) {
-    $appNames = @($apps.DisplayLabel) + "Exit"
+    $appNames = @($apps.DisplayLabel)
+    $appNames += "Reboot Device"
+    $appNames += "Exit"
     $selection = Show-Menu -title "Select an Application" -options $appNames
     $selection
     if ($selection -eq -1 -or $selection -eq ($appNames.Count - 1)) {
         # Esc or Exit
         break
     }
-
+    if ($selection -eq ($appNames.Count - 2)) {
+        # Reboot Device
+        if (Test-AdbConnection) {
+            Write-Host "Rebooting device..."
+            & $AdbPath reboot
+            Write-Host "Device is rebooting. Please wait..."
+            pause
+        }
+        continue
+    }
     $selectedApp = $apps[$selection]
     
     # Action Menu Loop
